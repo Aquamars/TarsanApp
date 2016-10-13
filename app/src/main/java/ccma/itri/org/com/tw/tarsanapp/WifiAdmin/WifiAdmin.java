@@ -109,6 +109,11 @@ public class WifiAdmin {
         return (mWifiInfo == null) ? "NULL" : mWifiInfo.getMacAddress();
     }
 
+    // 得到接入點的SSID
+    public String getSSID() {
+        return (mWifiInfo == null) ? "NULL" : mWifiInfo.getSSID();
+    }
+
     // 得到接入點的BSSID
     public String getBSSID() {
         return (mWifiInfo == null) ? "NULL" : mWifiInfo.getBSSID();
