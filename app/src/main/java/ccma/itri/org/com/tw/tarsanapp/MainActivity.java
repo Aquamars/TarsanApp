@@ -4,11 +4,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.Build;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,10 +34,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String wifis[];
 //    private WifiScanReceiver wifiReciever;
     private WifiManager wifiManager;
-    private Button open, close, ccma, itri;
+    private Button open, close, ccma, itri, setting, isEnable;
     private WifiManager.WifiLock wifiLock;
     private WifiAdmin wifiAdmin;
-    private TextView txt1;
+    private TextView txt1, txt2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,13 +46,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         lv=(ListView)findViewById(R.id.listView);
 
         wifiAdmin = new WifiAdmin(this);
+        wifiAdmin.startScan();
         wifiAdmin.closeWifi();
         wifiAdmin.openWifi();
-        wifiAdmin.startScan();
         wifiAdmin.addNetwork(wifiAdmin.CreateWifiInfo("ITRI_Free_WiFi_CPE_1","ICLITRI2016",3));
-        getList();
+//        getList();
         txt1 = (TextView)findViewById(R.id.txt1);
-        txt1.setText(wifiAdmin.getBSSID());
+        txt1.setText(wifiAdmin.getSSID());
+        txt2 = (TextView)findViewById(R.id.txt2);
+        txt2.setText("not yet");
+
+//        Settings.Secure.putString(getContentResolver(),
+//                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "ccma.itri.org.com.tw.tarsanapp/ccma.itri.org.com.tw.tarsanapp.AbService.MyService");
+//        Settings.Secure.putString(getContentResolver(),
+//                Settings.Secure.ACCESSIBILITY_ENABLED, "1");
+
+//        isAccessibilityEnabled();
 //        txt1.setText(wifiAdmin.lookUpScan());
 
         //# enable WIFI
@@ -78,10 +92,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         close = (Button)findViewById(R.id.close);
         ccma = (Button)findViewById(R.id.ccma);
         itri = (Button)findViewById(R.id.itri);
+        setting = (Button)findViewById(R.id.setting);
+        isEnable = (Button)findViewById(R.id.enable);
         open.setOnClickListener(this);
         close.setOnClickListener(this);
         ccma.setOnClickListener(this);
         itri.setOnClickListener(this);
+        setting.setOnClickListener(this);
+        isEnable.setOnClickListener(this);
     }
 
     private void connectWiFi(String ssid, String pwd){
@@ -158,16 +176,70 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 wifiAdmin.openWifi();
                 wifiAdmin.addNetwork(wifiAdmin.CreateWifiInfo("CCMA-GUEST","ITRI02750963",3));
                 showToast("connect");
+                txt1.setText(wifiAdmin.getSSID());
                 break;
             case R.id.itri:
                 wifiAdmin.openWifi();
                 wifiAdmin.addNetwork(wifiAdmin.CreateWifiInfo("ITRI_Free_WiFi_CPE_1","ICLITRI2016",3));
                 showToast("connect");
+                txt1.setText(wifiAdmin.getSSID());
+                break;
+            case R.id.setting:
+                Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                startActivity(intent);
+                break;
+            case R.id.enable:
+                isAccessibilityEnabled();
                 break;
         }
     }
 
     private void showToast(String text){
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+    }
+
+    public boolean isAccessibilityEnabled(){
+        int accessibilityEnabled = 0;
+        String LOGTAG = "isAbEnabled";
+//        final String LIGHTFLOW_ACCESSIBILITY_SERVICE = "com.example.test/com.example.text.ccessibilityService";
+        boolean accessibilityFound = false;
+
+        txt2.setText("");
+        try {
+            accessibilityEnabled = Settings.Secure.getInt(this.getContentResolver(),android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
+            Log.d(LOGTAG, "ACCESSIBILITY: " + accessibilityEnabled);
+        } catch (Settings.SettingNotFoundException e) {
+            Log.d(LOGTAG, "Error finding setting, default accessibility to not found: " + e.getMessage());
+        }
+
+        TextUtils.SimpleStringSplitter mStringColonSplitter = new TextUtils.SimpleStringSplitter(':');
+
+        if (accessibilityEnabled==1){
+            Log.d(LOGTAG, "***ACCESSIBILIY IS ENABLED***: ");
+
+            String settingValue = Settings.Secure.getString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            Log.d(LOGTAG, "Setting: " + settingValue);
+
+            if (settingValue != null) {
+                TextUtils.SimpleStringSplitter splitter = mStringColonSplitter;
+                splitter.setString(settingValue);
+                while (splitter.hasNext()) {
+                    String accessabilityService = splitter.next();
+                    Log.d(LOGTAG, "Setting: " + accessabilityService);
+                    if (accessabilityService.equalsIgnoreCase("ccma.itri.org.com.tw.tarsanapp/ccma.itri.org.com.tw.tarsanapp.AbService.MyService")){
+                        Log.d(LOGTAG, "We've found the correct setting - accessibility is switched on!");
+                        txt2.setText("ccma.itri.org.com.tw.tarsanapp/ccma.itri.org.com.tw.tarsanapp.AbService.MyService");
+                        return true;
+                    }
+                }
+            }
+
+            Log.d(LOGTAG, "***END***");
+        }
+        else{
+            Log.d(LOGTAG, "***ACCESSIBILIY IS DISABLED***");
+        }
+
+        return accessibilityFound;
     }
 }
