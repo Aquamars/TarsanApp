@@ -138,6 +138,8 @@ public class WifiAdmin {
     public void addNetwork(WifiConfiguration wcg) {
         int wcgID = mWifiManager.addNetwork(wcg);
         boolean b =  mWifiManager.enableNetwork(wcgID, true);
+        mWifiManager.reconnect();
+
         System.out.println("a--" + wcgID);
         System.out.println("b--" + b);
     }
