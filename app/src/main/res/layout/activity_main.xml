@@ -68,6 +68,11 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/enable"
                 android:text="isenable"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/guide"
+                android:text="Guide" />
         </LinearLayout>
     </LinearLayout>
     <ListView
