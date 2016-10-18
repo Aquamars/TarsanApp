@@ -48,16 +48,16 @@ public class CheckService extends Application {
             Log.d(LOGTAG, "***ACCESSIBILIY IS ENABLED***: ");
 
             String settingValue = Settings.Secure.getString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-            Log.d(LOGTAG, "Setting: " + settingValue);
+//            Log.d(LOGTAG, "Setting: " + settingValue);
 
             if (settingValue != null) {
                 TextUtils.SimpleStringSplitter splitter = mStringColonSplitter;
                 splitter.setString(settingValue);
                 while (splitter.hasNext()) {
                     String accessabilityService = splitter.next();
-                    Log.d(LOGTAG, "Setting: " + accessabilityService);
+//                    Log.d(LOGTAG, "Setting: " + accessabilityService);
                     if (accessabilityService.equalsIgnoreCase("ccma.itri.org.com.tw.tarsanapp/ccma.itri.org.com.tw.tarsanapp.AbService.MyService")){
-                        Log.d(LOGTAG, "We've found the correct setting - accessibility is switched on!");
+//                        Log.d(LOGTAG, "We've found the correct setting - accessibility is switched on!");
                         return true;
                     }
                 }
