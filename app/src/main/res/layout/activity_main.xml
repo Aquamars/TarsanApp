@@ -12,6 +12,34 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/ll4"
+        android:orientation="vertical"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="135dp"
+            android:src="@drawable/itri"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:id="@+id/txt_ssid"
+            android:text="WIFI_SSID"/>
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/listView"
+            android:clickable="true"
+            android:layout_below="@+id/txt_ssid"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:background="#554F4F" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ll4"
         android:id="@+id/ll1"
         android:orientation="horizontal">
         <Button
@@ -75,13 +103,4 @@
                 android:text="Guide" />
         </LinearLayout>
     </LinearLayout>
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/listView"
-        android:clickable="true"
-        android:layout_below="@+id/ll2"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:background="#554F4F" />
 </RelativeLayout>
