@@ -4,6 +4,9 @@ import android.app.Application;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.squareup.leakcanary.LeakCanary;
 
 /**
  * Created by A40503 on 2016/10/14.
@@ -18,6 +21,12 @@ public class CheckService extends Application {
         super.onCreate();
         Instance = this;
         mEnabled = isAccessibilityEnabled();
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+        LeakCanary.install(this);
     }
 
     public synchronized static CheckService getInstance(){
@@ -70,5 +79,9 @@ public class CheckService extends Application {
         }
 
         return accessibilityFound;
+    }
+
+    public void showToast(String text){
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
 }
