@@ -5,8 +5,14 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.util.Log;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import ccma.itri.org.com.tw.tarsanapp.CheckService;
+import rx.Observable;
+import rx.Subscriber;
 
 /**
  * Created by A40503 on 2016/10/12.
@@ -17,11 +23,19 @@ public class WifiAdmin {
     private WifiInfo mWifiInfo;
     private List<ScanResult> mWifiList;
     private List<WifiConfiguration> mWifiConfiguration;
-    WifiManager.WifiLock mWifiLock;
-
-    public WifiAdmin(Context context){
+    private WifiManager.WifiLock mWifiLock;
+    private static WifiAdmin Instance = null;
+    private WifiAdmin(Context context){
+        Instance = this;
         mWifiManager = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
         mWifiInfo =mWifiManager.getConnectionInfo();
+    }
+
+    public static WifiAdmin getInstance(Context context){
+        if(Instance == null){
+            Instance = new WifiAdmin(context.getApplicationContext());
+        }
+        return Instance;
     }
 
     // 打開WIFI
@@ -138,10 +152,25 @@ public class WifiAdmin {
     public void addNetwork(WifiConfiguration wcg) {
         int wcgID = mWifiManager.addNetwork(wcg);
         boolean b =  mWifiManager.enableNetwork(wcgID, true);
-        mWifiManager.reconnect();
+        Log.d("addNetwork",wcg.SSID+":"+wcgID);
+//        mWifiManager.reconnect();
+
+        //# Update connectionInfo
+        mWifiInfo =mWifiManager.getConnectionInfo();
 
         System.out.println("a--" + wcgID);
         System.out.println("b--" + b);
+    }
+
+    //# add Network return boolean
+    public boolean activeNetwork(WifiConfiguration wcg){
+        int wcgID = mWifiManager.addNetwork(wcg);
+        boolean b =  mWifiManager.enableNetwork(wcgID, true);
+        Log.d("activeNetwork",wcg.SSID+":"+wcgID+":"+b);
+        //# Update connectionInfo
+        mWifiInfo =mWifiManager.getConnectionInfo();
+        Log.d("activeNetwork",mWifiInfo.getSSID());
+        return b;
     }
 
     // 斷開指定ID的網络
@@ -150,10 +179,9 @@ public class WifiAdmin {
         mWifiManager.disconnect();
     }
 
-//然後是一個實際應用方法，只驗證過沒有密碼的情況：
 
-    public WifiConfiguration CreateWifiInfo(String SSID, String Password, int Type)
-    {
+    public WifiConfiguration CreateWifiInfo(String SSID, String Password, int Type){
+
         WifiConfiguration config = new WifiConfiguration();
         config.allowedAuthAlgorithms.clear();
         config.allowedGroupCiphers.clear();
@@ -199,11 +227,11 @@ public class WifiAdmin {
             config.status = WifiConfiguration.Status.ENABLED;
         }
         mWifiManager.enableNetwork(config.networkId,true);
+        Log.d("CreateWifiInfo",config.networkId+":"+SSID );
         return config;
     }
 
-    private WifiConfiguration IsExsits(String SSID)
-    {
+    private WifiConfiguration IsExsits(String SSID){
         List<WifiConfiguration> existingConfigs = mWifiManager.getConfiguredNetworks();
         for (WifiConfiguration existingConfig : existingConfigs)
         {
@@ -215,5 +243,79 @@ public class WifiAdmin {
         return null;
     }
 
+    //# Observable wifi Control
+    public Observable<String> startScan = Observable.create(new Observable.OnSubscribe<String>() {
+        @Override
+        public void call(Subscriber<? super String> subscriber) {
+            subscriber.onNext("startScan");
+            Instance.startScan();
+            subscriber.onCompleted();
+        }
+    });
+    public Observable<String> closeWifi = Observable.create(new Observable.OnSubscribe<String>() {
+        @Override
+        public void call(Subscriber<? super String> subscriber) {
+            subscriber.onNext("closeWifi");
+            Instance.closeWifi();
+            subscriber.onCompleted();
+        }
+    }).delay(1000, TimeUnit.MILLISECONDS);
+    public Observable<String> openWifi = Observable.create(new Observable.OnSubscribe<String>() {
+        @Override
+        public void call(Subscriber<? super String> subscriber) {
+            subscriber.onNext("openWifi");
+            Instance.openWifi();
+            subscriber.onCompleted();
+        }
+    }).delay(1000, TimeUnit.MILLISECONDS);
+    public Observable<String> addNetwork = Observable.create(new Observable.OnSubscribe<String>() {
+        @Override
+        public void call(Subscriber<? super String> subscriber) {
+            subscriber.onNext("addNetwork");
+//            wifiAdmin.activeNetwork(wifiAdmin.CreateWifiInfo("CCMA-GUEST","ITRI02750963",3));
+            Instance.activeNetwork(Instance.CreateWifiInfo("ITRI_Free_WiFi_CPE_1","ICLITRI2016",3));
+            subscriber.onCompleted();
+        }
+    }).delay(1300, TimeUnit.MILLISECONDS);
+
+    public String WifiOpen() {
+        if (!mWifiManager.isWifiEnabled()) {
+            mWifiManager.setWifiEnabled(true);
+        }
+        return "OpenWifi";
+    }
+
+    public String WifiClose() {
+        if (mWifiManager.isWifiEnabled()) {
+            mWifiManager.setWifiEnabled(false);
+        }
+        return "CloseWifi";
+    }
+
+    public String WifiStartScan() {
+        mWifiManager.startScan();
+        // 得到掃描結果
+        mWifiList = mWifiManager.getScanResults();
+        // 得到配置好的網络連接
+        mWifiConfiguration = mWifiManager.getConfiguredNetworks();
+
+        if(mWifiList==null){
+            return WifiStartScan();
+        }
+
+        return "StartScan";
+    }
+
+    public String WifiActiveNetwork(WifiConfiguration wcg){
+        int wcgID = mWifiManager.addNetwork(wcg);
+        boolean b =  mWifiManager.enableNetwork(wcgID, true);
+        Log.d("activeNetwork",wcg.SSID+":"+wcgID+":"+b);
+        //# Update connectionInfo
+        mWifiInfo =mWifiManager.getConnectionInfo();
+        Log.d("activeNetwork",mWifiInfo.getSSID());
+        if(b)return "ActiveNetwork";
+
+        return "NotActive";
+    }
 
 }
