@@ -26,20 +26,20 @@ public class MyService extends AccessibilityService {
         String eventText = event.getText().toString();
         showToast("onAccessibilityEvent");
         if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_CLICKED) {
-            myVibrator.vibrate(1000);
+//            myVibrator.vibrate(1000);
         }
         switch(eventType) {
             case AccessibilityEvent.TYPE_VIEW_CLICKED:
                 showToast(eventText);
-                myVibrator.vibrate(500);
+//                myVibrator.vibrate(500);
                 break;
             case AccessibilityEvent.TYPE_VIEW_FOCUSED:
                 showToast(eventText);
-                myVibrator.vibrate(500);
+//                myVibrator.vibrate(500);
                 break;
             case AccessibilityEvent.TYPE_VIEW_SCROLLED:
                 showToast(eventText);
-                myVibrator.vibrate(500);
+//                myVibrator.vibrate(500);
                 break;
         }
         Log.d("service", eventText);
