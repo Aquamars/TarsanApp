@@ -25,6 +25,7 @@ public final class DefaultGuide extends AppIntro {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("DefaultGuide","onCreate");
         addSlide(FragmentSlide.newInstance(R.layout.guide_one));
         addSlide(FragmentSlide.newInstance(R.layout.guide_two));
         addSlide(FragmentSlide.newInstance(R.layout.guide_three));
@@ -58,8 +59,15 @@ public final class DefaultGuide extends AppIntro {
 
     void loadMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
         this.finish();
+        startActivity(intent);
+//        try {
+//            this.finalize();
+//        } catch (Throwable throwable) {
+//            throwable.printStackTrace();
+//        }
+
+
     }
 
     @Override
