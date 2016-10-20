@@ -86,7 +86,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //            h1.postDelayed(runnable, 2000);
         Log.d("accessFlow", String.valueOf(enabled));
         if(enabled){
-            Observable.concat(startScan, closeWifi, openWifi, addNetwork)
+            Observable.concat(
+                    wifiAdmin.startScan.delay(1000, TimeUnit.MILLISECONDS),
+                    wifiAdmin.closeWifi.delay(1000, TimeUnit.MILLISECONDS),
+                    wifiAdmin.openWifi,
+                    wifiAdmin.addNetwork.delay(1300, TimeUnit.MILLISECONDS))
                     .subscribeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Subscriber<String>() {
                         @Override
@@ -309,39 +313,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //            this.finish();
 //        }
     }
-
-    Observable<String> startScan = Observable.create(new Observable.OnSubscribe<String>() {
-        @Override
-        public void call(Subscriber<? super String> subscriber) {
-            subscriber.onNext("startScan");
-            wifiAdmin.startScan();
-            subscriber.onCompleted();
-        }
-    });
-    Observable<String> closeWifi = Observable.create(new Observable.OnSubscribe<String>() {
-        @Override
-        public void call(Subscriber<? super String> subscriber) {
-            subscriber.onNext("closeWifi");
-            wifiAdmin.closeWifi();
-            subscriber.onCompleted();
-        }
-    }).delay(1000, TimeUnit.MILLISECONDS);
-    Observable<String> openWifi = Observable.create(new Observable.OnSubscribe<String>() {
-        @Override
-        public void call(Subscriber<? super String> subscriber) {
-            subscriber.onNext("openWifi");
-            wifiAdmin.openWifi();
-            subscriber.onCompleted();
-        }
-    }).delay(1000, TimeUnit.MILLISECONDS);
-    Observable<String> addNetwork = Observable.create(new Observable.OnSubscribe<String>() {
-        @Override
-        public void call(Subscriber<? super String> subscriber) {
-            subscriber.onNext("addNetwork");
-//            wifiAdmin.activeNetwork(wifiAdmin.CreateWifiInfo("CCMA-GUEST","ITRI02750963",3));
-            wifiAdmin.activeNetwork(wifiAdmin.CreateWifiInfo("ITRI_Free_WiFi_CPE_1","ICLITRI2016",3));
-            subscriber.onCompleted();
-        }
-    }).delay(1300, TimeUnit.MILLISECONDS);
+    //# Observable wifi Control
+//    Observable<String> startScan = Observable.create(new Observable.OnSubscribe<String>() {
+//        @Override
+//        public void call(Subscriber<? super String> subscriber) {
+//            subscriber.onNext("startScan");
+//            wifiAdmin.startScan();
+//            subscriber.onCompleted();
+//        }
+//    });
+//    Observable<String> closeWifi = Observable.create(new Observable.OnSubscribe<String>() {
+//        @Override
+//        public void call(Subscriber<? super String> subscriber) {
+//            subscriber.onNext("closeWifi");
+//            wifiAdmin.closeWifi();
+//            subscriber.onCompleted();
+//        }
+//    }).delay(1000, TimeUnit.MILLISECONDS);
+//    Observable<String> openWifi = Observable.create(new Observable.OnSubscribe<String>() {
+//        @Override
+//        public void call(Subscriber<? super String> subscriber) {
+//            subscriber.onNext("openWifi");
+//            wifiAdmin.openWifi();
+//            subscriber.onCompleted();
+//        }
+//    }).delay(1000, TimeUnit.MILLISECONDS);
+//    Observable<String> addNetwork = Observable.create(new Observable.OnSubscribe<String>() {
+//        @Override
+//        public void call(Subscriber<? super String> subscriber) {
+//            subscriber.onNext("addNetwork");
+////            wifiAdmin.activeNetwork(wifiAdmin.CreateWifiInfo("CCMA-GUEST","ITRI02750963",3));
+//            wifiAdmin.activeNetwork(wifiAdmin.CreateWifiInfo("ITRI_Free_WiFi_CPE_1","ICLITRI2016",3));
+//            subscriber.onCompleted();
+//        }
+//    }).delay(1300, TimeUnit.MILLISECONDS);
 
 }
