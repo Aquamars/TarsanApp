@@ -27,5 +27,17 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.2.1'
     /* PugNotification */
     compile 'com.github.halysongoncalves:pugnotification:1.8.1'
+    /* appintro */
+    compile 'com.github.paolorotolo:appintro:4.1.0'
+    /* rxAndroid*/
+    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'io.reactivex:rxjava:1.1.6'
+
+    /* LeakCanary */
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
+    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
+
     testCompile 'junit:junit:4.12'
+
 }
